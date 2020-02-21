@@ -1,4 +1,5 @@
-import { createStore } from 'redux';
+import { createStore} from 'redux';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -107,19 +108,38 @@ const visibilityFilter = (state = 'SHOW_ALL',action) => {
 }
 };
 
-const todoApp = (state = {}, action) => {
-    return {
-        todos: todos(
-            state.todos,
-            action
-        ),
-        visibilityFilter: visibilityFilter(
-            state.visibilityFilter,
-            action
-        )
-    };
-};
+// const todoApp = (state = {}, action) => {
+//     return {
+//         todos: todos(
+//             state.todos,
+//             action
+//         ),
+//         visibilityFilter: visibilityFilter(
+//             state.visibilityFilter,
+//             action
+//         )
+//     };
+// };
 
+const combineReducers = (reducers) => {
+    return (state = {}, action) => {
+        return Object.keys(reducers).reduce(
+            (nextState, key ) => {
+                nextState[key] = reducers[key](
+                    state[key],
+                    action
+                );
+            return nextState;
+            },
+            {}
+        );
+    }
+}
+
+const todoApp = combineReducers({
+    todos,
+    visibilityFilter,
+});
 
 const store = createStore(todoApp);
 console.log('Initial state ------ ');
@@ -135,7 +155,7 @@ store.dispatch({
 store.dispatch({
     type: 'ADD_TODO',
     id: 1,
-    text: 'Hacer ejercicio'
+    text: 'Hacer tareas'
 });
 
 
