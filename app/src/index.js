@@ -1,5 +1,4 @@
-import { createStore} from 'redux';
-
+import { createStore, combineReducers } from 'redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -121,54 +120,70 @@ const visibilityFilter = (state = 'SHOW_ALL',action) => {
 //     };
 // };
 
-const combineReducers = (reducers) => {
-    return (state = {}, action) => {
-        return Object.keys(reducers).reduce(
-            (nextState, key ) => {
-                nextState[key] = reducers[key](
-                    state[key],
-                    action
-                );
-            return nextState;
-            },
-            {}
-        );
-    }
-}
+// const combineReducers = (reducers) => {
+//     return (state = {}, action) => {
+//         return Object.keys(reducers).reduce(
+//             (nextState, key ) => {
+//                 nextState[key] = reducers[key](
+//                     state[key],
+//                     action
+//                 );
+//             return nextState;
+//             },
+//             {}
+//         );
+//     }
+// }
 
 const todoApp = combineReducers({
     todos,
     visibilityFilter,
 });
 
+const { Component } = React;
+
+let nextTodoId = 0;
+class TodoApp extends Component {
+    render() {
+        return (
+            <div>
+                <input placeholder='Insert a task' ref={node => {
+                    this.input = node;
+                }}></input>
+                <button onClick = {() => {
+                    store.dispatch({
+                        type: 'ADD_TODO',
+                        text: this.input.value,
+                        id: nextTodoId++
+                    });
+                    this.input.value = '';
+                }}>
+                    Add Todo
+                </button>
+                <ul>
+                    {this.props.todos.map(todo => 
+                        <li key={todo.id}>
+                            {todo.text}
+                        </li>
+                        )}
+                </ul>
+            </div>
+        );
+    }
+}
+
 const store = createStore(todoApp);
-console.log('Initial state ------ ');
-console.log(store.getState());
-console.log(' ------ ');
 
-store.dispatch({
-    type: 'ADD_TODO',
-    id: 0,
-    text: 'Hacer ejercicio'
-});
-
-store.dispatch({
-    type: 'ADD_TODO',
-    id: 1,
-    text: 'Hacer tareas'
-});
+const render = () => {
+    ReactDOM.render(
+        <TodoApp 
+            todos={store.getState().todos}
+            
+        />,
+        document.getElementById('root')
+    );
+};
 
 
-
-store.dispatch({
-    type: 'TOGGLE_TODO',
-    id: 1,
-    text: 'Hacer ejercicio'
-});
-
-
-
-store.dispatch({type:'SET_VISIBILITY_FILTER', filter:'SHOW_COMPLETED'});
-
-
-console.log(store.getState());
+store.subscribe(render);
+render();
