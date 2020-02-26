@@ -166,6 +166,7 @@ const Link = ({
 class FilterLink extends Component {
 
     componentWillMount() {
+        const { store } = this.props;
         this.unsubscribe = store.subscribe(() => 
             this.forceUpdate()
         );
@@ -177,7 +178,9 @@ class FilterLink extends Component {
 
     render() {
         const props = this.props;
+        const { store } = props;
         const state = store.getState();
+
 
         return (
             <Link
@@ -199,26 +202,27 @@ class FilterLink extends Component {
     }
 }
 
-const Footer = () => ( 
+const Footer = ({ store }) => ( 
     <p>
         Show: 
         {' '}
         <FilterLink
             filter = 'SHOW_ALL'
+            store = {store}
         >
             All
         </FilterLink>
         {' '}
         <FilterLink
             filter = 'SHOW_ACTIVE'
-
+            store = {store}
         >
             Show Active
         </FilterLink>
         {' '}
         <FilterLink
             filter = 'SHOW_COMPLETED'
-            
+            store = {store}
         >
             Show Completed
         </FilterLink>
@@ -260,7 +264,7 @@ const TodoList = ( {
 
 // -------------- [porque necesita un div?]
 // porque se utilizaba this.node y ahora solo node
-const AddTodo = () => {
+const AddTodo = ({ store }) => {
     let input;
     return(
         <div>
@@ -305,6 +309,7 @@ const getVisibleTodos = (
 class VisibleTodoList extends Component {
 
     componentWillMount() {
+        const { store } = this.props;
         this.unsubscribe = store.subscribe(() => 
             this.forceUpdate()
         );
@@ -340,20 +345,23 @@ class VisibleTodoList extends Component {
 }
 
 let nextTodoId = 0;
-const TodoApp = () => ( 
+const TodoApp = ({ store }) => ( 
         <div>
-            <AddTodo />
-            <VisibleTodoList />
-            <Footer />
+            <AddTodo store={store} />
+            <VisibleTodoList store={store} />
+            <Footer store={store} />
         </div>
     );
 
 
-const store = createStore(todoApp);
+
+
 
 
     ReactDOM.render(
-        <TodoApp />,
+        <TodoApp 
+        store = {createStore(todoApp)}
+        />,
         document.getElementById('root')
     );
 
